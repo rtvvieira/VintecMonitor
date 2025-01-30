@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor de Documentos Eletrônicos</title>
+    <link rel="stylesheet" href="/src/css/fontes.css">
+    <link rel="stylesheet" href="/src/css/reset.css">
+    <link rel="stylesheet" href="/src/css/estilos.css">
+    <link rel="stylesheet" href="/src/imagens/fundo-site.jpg">
+    <style>
+        /* Estilos de página */
+        body {
+            font-family: Inter, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #c08057;
+            color: #556b2f;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        header h1 {
+            font-size: 28px;
+            color: #556b2f;
+            margin: 0;
+        }
+        .form-header {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .form-header-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-header-item label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #556b2f;
+        }
+        .form-header-item input, .form-header-item select {
+            padding: 8px;
+            border: 2px solid #556b2f;
+            border-radius: 4px;
+            width: 100%;
+        }
+        .grid {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table th, table td {
+            border: 1px solid #ddd;
+            text-align: left;
+            padding: 10px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+        table th {
+            background: #556b2f;
+            color: white;
+            text-align: center;
+        }
+        table td {
+            text-align: left;
+        }
+        .actions {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .actions button {
+            background: #556b2f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .actions button:hover {
+            background: #6b8e23;
+        }
+        button.gerar-nota {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: #ddd;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button.gerar-nota:hover {
+            background-color: #45a049;
+        }
+        button.impressao-nota {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button.impressao-nota:hover {
+            background-color: #45a049;
+        }
+        img.lupa {
+            width: 16px;
+            height: 16px;
+            vertical-align: middle;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+
+        /* Login Styles */
+        .login-container {
+            background-image: url(../imagens/fundo-site.jpg);
+            background-repeat: no-repeat;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;  /* Centraliza verticalmente */
+            flex-direction: column;
+            min-height: 100vh;
+            gap: 30px;
+        }
+        .login-form {
+            background-color: #ddd;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+            
+        }
+        .login-form input {
+            margin-bottom: 10px;
+            padding: 8px;
+            width: 100%;
+            border-radius: 4px;
+            border: 2px solid #c08057;
+            
+        }
+        .login-form button {
+            background-color: #c08057;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+    </style>
+</head>
+<body>
+
+    <!-- Login Form -->
+    <div id="login" class="login-container">
+        <div class="login-form">
+            <h2>Login</h2>
+            <input type="text" id="username" placeholder="Usuário" autofocus onkeydown="checkEnter(event, 'password')" />
+            <input type="password" id="password" placeholder="senha" onkeydown="checkEnter(event, 'login')" />
+            <button onclick="login()">Acessar</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="main-content" class="container" style="display: none;">
+        <header>
+            <h1>Monitor de NFE</h1>
+        </header>
+
+        <!-- Header Form -->
+        <div class="form-header">
+            <div class="form-header-item">
+                <label for="empresa">Matriz</label>
+                <select id="Matriz">
+                    <option value="">VINTEC</option>
+                    <option value="">MONITOR</option>
+                </select>
+            </div>
+            <div class="form-header-item">
+                <label for="filial">Filial</label>
+                <select id="tipo-documento">
+                    <option value="">VINTEC</option>
+                    <option value="">MONITOR</option>
+                </select>
+                </div>
+            <div class="form-header-item">
+                <label for="periodo-inicial">Período Inicial</label>
+                <input type="date" id="periodo-inicial" placeholder="Informe o período inicial">
+            </div>
+            <div class="form-header-item">
+                <label for="periodo-final">Período Final</label>
+                <input type="date" id="periodo-final" placeholder="Informe o período final">
+            </div>
+            <div class="form-header-item">
+                <label for="numero-documento">Número Documento</label>
+                <input type="text" id="numero-documento" placeholder="Digite o número" oninput="filtrarTabela()">
+            </div>
+            <div class="form-header-item">
+                <label for="fornecedor">Fornecedor</label>
+                <input type="text" id="fornecedor" placeholder="Digite o CNPJ/CPF ou Nome do Fornecedor">
+            </div>
+            <div class="form-header-item">
+                <label for="endereco">Endereço</label>
+                <input type="text" id="endereco" placeholder="Endereço" disabled>
+            </div>
+            <div class="form-header-item">
+                <label for="tipo-documento">Tipo de Documento</label>
+                <select id="tipo-documento">
+                    <option value=""></option>
+                    <option value="nfe">NFe</option>
+                    <option value="nfse">NFSe</option>
+                    <option value="cte">CTe</option>
+                    </select>
+            </div>
+            <div class="form-header-item">
+                <label for="situacao-operacao">Ciencia da Operação</label>
+                <select id="tipo-evento">
+                    <option value=""></option>
+                    <option value="nfe">Confirmação da Operação - NF</option>
+                    <option value="nfe">Ciência da Emissão - NF</option>
+                    <option value="nfe">Desconhecimento da Operação - NF</option>
+                    <option value="nfe">Operação Não Realizada - NF</option>
+                    <option value="cte">Prestação de Serviço em Desacordo - CTE</option>
+                    <option value="cte">Ciência da Emissão - CTE</option>
+                    <option value="cte">Ciência da Emissão - NFS-e</option>
+                    </select>
+                </div>
+            <div class="form-header-item">
+                <label for="chave-danfe">Chave DANFE</label>
+                <input type="text" id="chave-danfe" placeholder="Informe a chave" oninput="filtrarPorChave()">
+            </div>
+            <div class="form-header-item">
+                <label for="tipo-evento">Tipo de Eventos</label>
+                <select id="tipo-evento">
+                    <option value=""></option>
+                    <option value="nfe">Carta de Correção Eletrônica(CC-e) - nfe</option>
+                    <option value="nfe">Cancelamento de NF-e</option>
+                    <option value="nfe">Carta de Correção Eletrônica (CC-e) - nfe</option>
+                    <option value="CT-e">Cancelamento de CT-e</option>
+                    <option value="CT-e">Prestação de Serviço em Desacordo - CTE</option>
+                    <option value="NFS-e">Cancelamento de NFS-e</option>
+                    <option value="NFS-e">Substituição de NFS-e</option>
+                    </select>
+            </div>
+        </div>
+
+        <!-- Grid Table -->
+        <div class="grid">
+            <table id="sortable-table">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="select-all" onclick="toggleAllCheckboxes(this)" /></th>
+                        <th draggable="true" ondragstart="drag(event)" id="col1">Status da NF-e</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col2">Descricao Status da NF-e</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col3">Emissão</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col4">Nº NF</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col5">Lançado no Sistema</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col6">Série</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col7">Chave de Acesso</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col8">CFOP-NF</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col9">Valor NF</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col10">Tp Doc</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col11">Tipo NFe/NFSe/CTe</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col12">Emitente</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col13">CPF/CNPJ</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col14">IE</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col15">UF</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col16">Destinatário</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col17">CPF/CNPJ</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col18">IE</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col19">UF</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col19">Hist_Eventos</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col19">Contratos</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col20">Requisição de Compra</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col21">Safra</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col22">Codigo Produto</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col23">Descricao Produto</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col24">Quantidade</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col25">Unidade</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col26">TL-NF</th> <!--informar o TL da NF-->
+                        <th draggable="true" ondragstart="drag(event)" id="col27">CFOP-ENTRADA</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col28">Código Patrimônio</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col29">Descrição Patrimônio</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col30">Gerar Financeiro</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col31">Parcela NF</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col32">Data Vencimento</th> <!--Informar a data de vencimento da nota fiscal-->
+                        <th draggable="true" ondragstart="drag(event)" id="col32">Codigo Barras Boletos</th> <!--Informar o código de barras do Boleto-->
+                        <th draggable="true" ondragstart="drag(event)" id="col33">TL-CTE</th> <!--informar o TL do Cte-->
+                        <th draggable="true" ondragstart="drag(event)" id="col34">Vincula_Cte</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col35">Data Vencimento</th> <!--Informar a data de vencimento do cte-->
+                        <th draggable="true" ondragstart="drag(event)" id="col32">Codigo Barras Boletos</th> <!--Informar o código de barras do Boleto CTE-->
+                        <th draggable="true" ondragstart="drag(event)" id="col36">Valor IPI</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col37">% IPI</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col38">Valor PIS</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col39">% PIS</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col40">Valor COFINS</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col41">% COFINS</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col42">Valor ICMS</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col43">% ICMS</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col44">Diferencial de Alíquota (R$)</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col45">Total Impostos</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col46">Ciencia da Operação</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col47">Gerar Nota</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col48">Impressão Nota</th>
+                        <th draggable="true" ondragstart="drag(event)" id="col49">Confirmar Oper</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="checkbox" class="row-checkbox" /></td>
+                        <td tabindex="0">100</td><!--Status da NF-e-->
+                        <td tabindex="0">Autorizado o uso da NF-e</td><!--Descrição do Status NFe, Cte ou NFSe-->
+                        <td tabindex="0">14/01/2025</td><!--Data Emissão da NF-->
+                        <td tabindex="0">54321</td><!--Numero da Nota Fiscal-->
+                        <td tabindex="0">Sim</td><!--lançado no Sistema-->
+                        <td tabindex="0">1</td><!--Serie da Nota Fiscal, NFSe ou CTe-->
+                        <td tabindex="0">51241200000408796901559200000051191905298982</td><!--Chave de acesso da Nota Fiscal, NFSe ou Cte-->
+                        <td tabindex="0">5101</td><!--CFOP DA NOTA FISCAL, NFSe ou CTE-->
+                        <td tabindex="0">R$ 2.500,00</td><!--Valor total da Nota Fiscal-->
+                        <td tabindex="0">NFe</td><!--Tp Doc-->
+                        <td tabindex="0">Entrada</td><!--NFe, NFSe ou CTe-->
+                        <td tabindex="0">Empresa Teste 01</td><!--Emitente da NF, NFSe ou Cte-->
+                        <td tabindex="0">123.456.789/0001-10</td><!--CPF/CNPJ do Emitente da NF, NFSe ou Cte-->
+                        <td tabindex="0">12345678</td><!--IE do Emitente da NF, NFSe ou Cte-->
+                        <td tabindex="0">MT</td><!--Estado de origem do Emitente da NF, NFSe ou Cte-->
+                        <td tabindex="0">Empresa Teste 01</td><!--Destinatario da NF, NFSe ou Cte-->
+                        <td tabindex="0">987.654.321/0001-20</td><!--CPF/CNPJ do Destinatario da NF, NFSe ou Cte-->
+                        <td tabindex="0">987654321</td><!--IE Destinatario da NF, NFSe ou Cte-->
+                        <td tabindex="0">SP</td><!--UF do Destinatario da NF, NFSe ou Cte-->
+                        <td tabindex="0"><img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('Historico_Eventos')" /></td><!--Irá trazer os historicos dos eventos da NF-->
+                        <td tabindex="0">CTR-001 <img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('Informe_o_Contrato')" /></td><!--Campo para pesquisa do contrato da nota fiscal-->
+                        <td tabindex="0">REQ-001 <img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('RequisicaoCompra')" /></td><!--Campo para pesquisa do contra da nota fiscal-->
+                        <td tabindex="0">2024/2025<img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('Informe_Safra')" /></td><!--A SAFRA DEVERA VIR DO PEDIDO DE COMPRAS OU INFORMAR MANUALMENTE-->
+                        <td tabindex="0">00001<img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('InformeCodigoProduto')" /></td><!--CODIGO O PRODUTO SISTEMA-->
+                        <td tabindex="0">ALGODAO EM PLUMA</td><!--iNFORMAR O PRODUTO-->
+                        <td tabindex="0">27.580,00</td><!--iNFORMAR A QUANTIDADE DO PRODUTO-->
+                        <td tabindex="0">KG</td><!--INFORMAR O TIPO DA UNIDADE DO PRODUTO-->
+                        <td tabindex="0">10 <img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('TL')" /></td><!--Campo para pesquisa para o Tipo de Lançamento-->
+                        <td tabindex="0">1101 <img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('TL')" /></td><!--CFOP DE ENTRADA DEVERA SER PREENCHIDO CONFORME O TL OU CONFORME A NECESSIDADE DO USUARIO -->
+                        <td tabindex="0">1234 <img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('CodigoPatrimonio')" /></td><!--Código do Patrimonio-->
+                        <td tabindex="0">Patrimônio 1</td><!--Descrição do Patrimonio-->
+                        <td tabindex="0">Sim</td><!--Gera Financeiro-->
+                        <td tabindex="0"><input type="number" value="4" min="1" style="width: 60px; text-align: center;" /></td><!--Quantidade de Parcelas-->
+                        <td tabindex="0"><input type="date" value="2025-01-14" style="width: 100%; text-align: center;" /></td><!-- Campo editável para data de vencimento da nota fiscal-->
+                        <td tabindex="0">51241200000408796901559200000051191905298982<img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('Informe_Codigo_de_Barras_Boleto')" /></td><!--Campo para inclusão de codigo de barras do boleto-->
+                        <td tabindex="0">10 <img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('TL')" /></td><!--Informar o TL do CTE-->
+                        <td tabindex="0"><input type="number" value="" min="1" style="width: 60px; text-align: center;" /></td><!--Informar o numero do Cte ou vincular dentro do monitor de nfe-->
+                        <td tabindex="0"><input type="date" value="2025-01-14" style="width: 100%; text-align: center;" /></td><!-- Campo editável para data de vencimento do CTE-->
+                        <td tabindex="0">51241200000408796901559200000051191905298982<img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('Informe_Codigo_de_Barras_Boleto')" /></td><!--Campo para inclusão de codigo de barras do boleto-->
+                        <td tabindex="0">R$ 250,00</td><!--Valor do IPI-->
+                        <td tabindex="0">10%</td><!--% IPI-->
+                        <td tabindex="0">R$ 41,25</td><!--Valor PIS-->
+                        <td tabindex="0">1. 65%</td><!--% PIS-->
+                        <td tabindex="0">R$ 190,00</td><!--Valor Cofins-->
+                        <td tabindex="0">7.6%</td><!--%Cofins-->
+                        <td tabindex="0">R$ 450,00</td><!--Valor Icms-->
+                        <td tabindex="0">18%</td><!--%Icms-->
+                        <td tabindex="0">R$ 100,00</td><!-- Valor do diferencial de alíquota -->
+                        <td tabindex="0">R$ 931,25</td><!-- Total dos impostos -->
+                        <td tabindex="0">
+                            <select id="ciencia-operacao">
+                                <option value="">Selecione</option>
+                                <option value="confirmar">Confirmar</option>
+                                <option value="desconhecer">Desconhecer</option>
+                                <option value="naoRealizar">Não Realizar</option>
+                            </select>
+                        </td>
+                        <td tabindex="0"><button class="gerar-nota" onclick="gerarNota(this)">Gerar Nota</button></td>
+                        <td tabindex="0"><button class="impressao-nota" onclick="impressaoNota()">Imprimir Nota</button></td>
+                        <td tabindex="0"><button class="confirmar-operacao" onclick="confirmarOperacao()">Salvar</button></td>
+                    </tr>
+                </tbody>
+                <tbody>
+                    <tr>
+                        <td><input type="checkbox" class="row-checkbox" /></td>
+                        <td tabindex="0">203</td>
+                        <td tabindex="0">Rejeição: Emitente não habilitado para emissão da NFS-e</td>
+                        <td tabindex="0">14/01/2025</td>
+                        <td tabindex="0">3419</td>
+                        <td tabindex="0">NAO</td>
+                        <td tabindex="0">1</td>
+                        <td tabindex="0">51241200000408796901559200000051191905298982</td>
+                        <td tabindex="0">5353</td>
+                        <td tabindex="0">R$ 2.500,00</td>
+                        <td tabindex="0">CTE</td>
+                        <td tabindex="0">Entrada</td>
+                        <td tabindex="0">Empresa Teste 02</td>
+                        <td tabindex="0">123.456.789/0001-10</td>
+                        <td tabindex="0">12345678</td>
+                        <td tabindex="0">MT</td>
+                        <td tabindex="0">Empresa Teste 02</td>
+                        <td tabindex="0">987.654.321/0001-20</td>
+                        <td tabindex="0">987654321</td>
+                        <td tabindex="0">MT</td>
+                        <td tabindex="0"><img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('Historico_Eventos')" /></td>
+                        <td tabindex="0"><img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('Informe_o_Contrato')" /></td><!--Campo para pesquisa do contrato da nota fiscal-->
+                        <td tabindex="0"><img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('RequisicaoCompra')" /></td>
+                        <td tabindex="0">25<img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('Informe_Safra')" /></td>
+                        <td tabindex="0"><img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('InformeCodigoProduto')" /></td>
+                        <td tabindex="0">SERVICO FRETE</td>
+                        <td tabindex="0">1</td>
+                        <td tabindex="0">UN</td>
+                        <td tabindex="0"><img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('TL')" /></td>
+                        <td tabindex="0"><img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('Informe_CFOP_de_Entrada')" /></td>
+                        <td tabindex="0"><img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('CodigoPatrimonio')" /></td>
+                        <td tabindex="0"></td>
+                        <td tabindex="0"></td>
+                        <td tabindex="0"><input type="number" value="4" min="1" style="width: 60px; text-align: center;" /></td>
+                        <td tabindex="0"><input type="date" value="2025-01-14" style="width: 100%; text-align: center;" /></td>
+                        <td tabindex="0">51241200000408796901559200000051191905298982<img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('Informe_Codigo_de_Barras_Boleto')" /></td><!--Campo para inclusão de codigo de barras do boleto-->
+                        <td tabindex="0"><img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('TL')" /></td>
+                        <td tabindex="0"><img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('Informar_ou_vincular_Numero_Cte')" /></td>
+                        <td tabindex="0"><input type="date" value="2025-01-14" style="width: 100%; text-align: center;" /></td>
+                        <td tabindex="0">51241200000408796901559200000051191905298982<img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('Informe_Codigo_de_Barras_Boleto')" /></td><!--Campo para inclusão de codigo de barras do boleto-->
+                        <td tabindex="0">0,00</td>
+                        <td tabindex="0">0%</td>
+                        <td tabindex="0">0,00</td>
+                        <td tabindex="0">0,00%</td>
+                        <td tabindex="0">0,00</td>
+                        <td tabindex="0">0%</td>
+                        <td tabindex="0">0,00</td>
+                        <td tabindex="0">0%</td>
+                        <td tabindex="0">R$ 0,00</td>
+                        <td tabindex="0">R$ 0,00</td>
+                        <td tabindex="0">
+                            <select id="ciencia-operacao">
+                                <option value="">Selecione</option>
+                                <option value="confirmar">Confirmar</option>
+                                <option value="desconhecer">Desconhecer</option>
+                                <option value="naoRealizar">Não Realizar</option>
+                            </select>
+                        </td>
+                        <td tabindex="0"><button class="gerar-nota" onclick="gerarNota(this)">Gerar Nota</button></td>
+                        <td tabindex="0"><button class="impressao-nota" onclick="impressaoNota()">Imprimir Nota</button></td>
+                        <td tabindex="0"><button class="confirmar-operacao" onclick="confirmarOperacao()">Salvar</button></td>
+                    </tr>
+                </tbody>
+                <tbody>
+                    <tr>
+                        <td><input type="checkbox" class="row-checkbox" /></td>
+                        <td tabindex="0">1</td>
+                        <td tabindex="0">Autorizado o uso da NF-e</td>
+                        <td tabindex="0">14/01/2025</td>
+                        <td tabindex="0">1934</td>
+                        <td tabindex="0">NAO</td>
+                        <td tabindex="0">1</td>
+                        <td tabindex="0">51241200000408796901559200000051191905298982</td>
+                        <td tabindex="0">5933</td>
+                        <td tabindex="0">R$ 2.500,00</td>
+                        <td tabindex="0">NFS-e</td>
+                        <td tabindex="0">Entrada</td>
+                        <td tabindex="0">Empresa Teste 03</td>
+                        <td tabindex="0">123.456.789/0001-10</td>
+                        <td tabindex="0">12345678</td>
+                        <td tabindex="0">MT</td>
+                        <td tabindex="0">Empresa Teste 03</td>
+                        <td tabindex="0">987.654.321/0001-20</td>
+                        <td tabindex="0">987654321</td>
+                        <td tabindex="0">MT</td>
+                        <td tabindex="0"><img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('Historico_Eventos')" /></td>
+                        <td tabindex="0"><img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('Informe_o_Contrato')" /></td><!--Campo para pesquisa do contrato da nota fiscal-->
+                        <td tabindex="0"><img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('RequisicaoCompra')" /></td>
+                        <td tabindex="0"><img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('Informe_Safra')" /></td>
+                        <td tabindex="0"><img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('InformeCodigoProduto')" /></td>
+                        <td tabindex="0">SERVICO ELETRICO</td>
+                        <td tabindex="0">10</td>
+                        <td tabindex="0">UN</td>
+                        <td tabindex="0"><img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen ('TL')" /></td>
+                        <td tabindex="0"><img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('TL')" /></td>
+                        <td tabindex="0"><img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('CodigoPatrimonio')" /></td>
+                        <td tabindex="0"></td>
+                        <td tabindex="0"></td>
+                        <td tabindex="0"><input type="number" value="4" min="1" style="width: 60px; text-align: center;" /></td>
+                        <td tabindex="0"><input type="date" value="2025-01-14" style="width: 100%; text-align: center;" /></td>
+                        <td tabindex="0">51241200000408796901559200000051191905298982<img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('Informe_Codigo_de_Barras_Boleto')" /></td><!--Campo para inclusão de codigo de barras do boleto-->
+                        <td tabindex="0"><img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('TL')" /></td>
+                        <td tabindex="0"><input type="number" value="" min="1" style="width: 60px; text-align: center;" /></td>
+                        <td tabindex="0"><input type="date" value="2025-01-14" style="width: 100%; text-align: center;" /></td>
+                        <td tabindex="0">51241200000408796901559200000051191905298982<img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Lupa" class="lupa" onclick="openScreen('Informe_Codigo_de_Barras_Boleto')" /></td><!--Campo para inclusão de codigo de barras do boleto-->
+                        <td tabindex="0">R$ 250,00</td>
+                        <td tabindex="0">10%</td>
+                        <td tabindex="0">R$ 41,25</td>
+                        <td tabindex="0">1.65%</td>
+                        <td tabindex="0">R$ 190,00</td>
+                        <td tabindex="0">7.6%</td>
+                        <td tabindex="0">R$ 450,00</td>
+                        <td tabindex="0">18%</td>
+                        <td tabindex="0">R$ 0,00</td>
+                        <td tabindex="0">R$ 0,00</td>
+                        <td tabindex="0">
+                            <select id="ciencia-operacao">
+                                <option value="">Selecione</option>
+                                <option value="confirmar">Confirmar</option>
+                                <option value="desconhecer">Desconhecer</option>
+                                <option value="naoRealizar">Não Realizar</option>
+                            </select>
+                        </td>
+                        <td tabindex="0"><button class="gerar-nota" onclick="gerarNota(this)">Gerar Nota</button></td>
+                        <td tabindex="0"><button class="impressao-nota" onclick="impressaoNota()">Imprimir Nota</button></td>
+                        <td tabindex="0"><button class="confirmar-operacao" onclick="confirmarOperacao()">Salvar</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+       <!-- Actions -->
+       <div class="actions">
+        <button onclick="confirmarTodasOperacoes()">Confirmar Operações</button>
+        <button onclick="desconhecerTodasOperacoes()">Desconhecer Operações</button>
+        <button onclick="naoRealizarTodasOperacoes()">Não Realizar Operações</button>
+        <button>Salvar</button>
+        <button>Atualizar</button>
+    </div>
+</div>
+
+<script>
+        // Função de arraste
+        let draggedColumn = null;
+
+        function drag(event) {
+            draggedColumn = event.target;
+        }
+
+        const sortableTable = document.getElementById('sortable-table');
+
+        sortableTable.addEventListener('dragover', (event) => {
+            event.preventDefault();
+        });
+
+        sortableTable.addEventListener('drop', (event) => {
+            if (draggedColumn !== null) {
+                const targetColumn = event.target;
+                const draggedIndex = [...sortableTable.rows[0].cells].indexOf(draggedColumn);
+                const targetIndex = [...sortableTable.rows[0].cells].indexOf(targetColumn);
+
+                if (draggedIndex !== targetIndex) {
+                    // Mover as células de coluna
+                    [...sortableTable.rows].forEach(row => {
+                        const draggedCell = row.cells[draggedIndex];
+                        const targetCell = row.cells[targetIndex];
+
+                        row.insertBefore(draggedCell, targetCell);
+                    });
+                }
+            }
+        });
+
+        function toggleAllCheckboxes(source) {
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            checkboxes.forEach(checkbox => checkbox.checked = source.checked);
+        }
+
+        function gerarNota() {
+            alert('Nota gerada!');
+        }
+
+        function openScreen(field) {
+            window.open(`/${field}`, '_blank', 'width=800,height =600');
+        }
+
+        function impressaoNota() {
+            alert('Nota Impressa!');
+        }
+
+        // Validação de Acesso ao login
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (username === '0' && password === '0') {
+                document.getElementById('login').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+            } else {
+                alert('Usuário ou senha incorretos');
+            }
+        }
+
+        function checkEnter(event, nextId) {
+            if (event.key === 'Enter') {
+                if (nextId === 'login') {
+                    login();
+                } else {
+                    document.getElementById(nextId).focus();
+                }
+            }
+        }
+
+        // Função para somar os valores dos impostos
+        function calcularTotalImpostos() {
+            const rows = document.querySelectorAll('#sortable-table tbody tr');
+            let total = 0;
+
+            rows.forEach(row => {
+                const valorIPI = parseFloat(row.cells[25].textContent.replace('R$', '').replace(',', '.')) || 0;
+                const valorPIS = parseFloat(row.cells[27].textContent.replace('R$', '').replace(',', '.')) || 0;
+                const valorCOFINS = parseFloat(row.cells[29].textContent.replace('R$', '').replace(',', '.')) || 0;
+                const valorICMS = parseFloat(row.cells[31].textContent.replace('R$', '').replace(',', '.')) || 0;
+
+                total += valorIPI + valorPIS + valorCOFINS + valorICMS;
+            });
+
+            document.getElementById('total-impostos').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+        }
+
+        // Função de filtro por número do documento
+        function filtrarTabela() {
+            const input = document.getElementById('numero-documento');
+            const filtro = input.value.toUpperCase();
+            const tabela = document.getElementById('sortable-table');
+            const linhas = tabela.getElementsByTagName('tr');
+
+            for (let i = 1; i < linhas.length; i++) { // Começa de 1 para pular o cabeçalho
+                const celula = linhas[i].getElementsByTagName('td')[4]; // Índice 4 = Coluna Nº NF
+                if (celula) {
+                    const textoCelula = celula.textContent || celula.innerText;
+                    linhas[i].style.display = textoCelula.toUpperCase().includes(filtro) ? "" : "none";
+                }
+            }
+        }
+
+        // Função de filtro por chave de acesso
+        function filtrarPorChave() {
+            const input = document.getElementById('chave-danfe');
+            const filtro = input.value.toUpperCase();
+            const tabela = document.getElementById('sortable-table');
+            const linhas = tabela.getElementsByTagName('tr');
+
+            for (let i = 1; i < linhas.length; i++) {
+                const celula = linhas[i].getElementsByTagName('td')[6]; // Índice 6 = Coluna Chave de Acesso
+                if (celula) {
+                    const textoCelula = celula.textContent || celula.innerText;
+                    linhas[i].style.display = textoCelula.toUpperCase().includes(filtro) ? "" : "none";
+                }
+            }
+        }
+
+        // Chamar a função para Calcular a função de impostos
+        calcularTotalImpostos();
+
+    </script>
+
+</body>
+</html>
