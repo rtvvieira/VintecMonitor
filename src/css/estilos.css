@@ -1,6 +1,6 @@
 body {
 	font-family: "Yugioh", serif;
-	background-image: url(/imagens/fundo-site.jpg);
+	background-image: url(../imagens/fundo-site.jpg);
 	background-repeat: no-repeat;
 	background-size: cover;
     display: flex;
@@ -16,7 +16,7 @@ body {
 }
 
 .cabecalho .titulo {
-	color: red;
+	background-image: url(../imagens/fundo-site.jpg);
 }
 
 .cartao {
@@ -161,12 +161,12 @@ body::-webkit-scrollbar-track{
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #c08057;
+    background: #007bff;
     border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #c08057;
+    background: #007bff;
 }
 
 .carta-virada {
